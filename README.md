@@ -3,7 +3,6 @@
 A retrieval-augmented chatbot for menstrual and reproductive health education — rebuilt on a
 modern, production-ready RAG stack and deployed as three independent services on Fly.io.
 
-**Live app:** https://aunt-flo-frontend.fly.dev
 
 ## What changed from the original
 
