@@ -1,7 +1,9 @@
+PYTHON ?= python3.12
+PYTHON ?= python3.12
 .PHONY: setup ollama ingest api ui docker-up docker-ingest test eval
 
 setup:            ## venv + deps + model
-	python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
+	$(PYTHON) -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
 	[ -f .env ] || cp .env.example .env
 	ollama pull $${LLM_MODEL:-qwen2.5:3b}
 
