@@ -1,0 +1,14 @@
+.venv/
+venv/
+vectorstore/
+state/
+data/*.pdf
+Data/
+Model/
+images/
+.git/
+.github/
+__pycache__/
+*.pyc
+*.db
+.env

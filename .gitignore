@@ -8,3 +8,5 @@ data/*.pdf
 .venv/
 venv/
 .DS_Store
+.DS_Store
+state/

@@ -8,12 +8,13 @@ Run:
     streamlit run app.py
 """
 import json
+import os
 import uuid
 
 import requests
 import streamlit as st
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Aunt Flo Assistant ��🤖", page_icon="🌸")
 st.title("Aunt Flo Assistant 🌸")

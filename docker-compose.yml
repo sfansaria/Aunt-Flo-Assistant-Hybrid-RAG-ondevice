@@ -1,24 +1,28 @@
+# Local-only stack: API + Streamlit frontend in containers.
+# Ollama runs NATIVELY on your Mac (Metal GPU acceleration; Docker on Mac has no GPU).
+# Start it first:  OLLAMA_HOST=0.0.0.0:11434 ollama serve
 services:
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - "11434:11434"
-
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - ollama
     environment:
-      - LLM_BASE_URL=http://ollama:11434/v1
+      - LLM_BASE_URL=http://host.docker.internal:11434/v1
       - LLM_API_KEY=ollama
-      - LLM_MODEL=llama3.1:8b
+      - LLM_MODEL=${LLM_MODEL:-qwen2.5:3b}
+      - USE_RERANKER=${USE_RERANKER:-false}
+      - RETRIEVAL_TOP_K=${RETRIEVAL_TOP_K:-6}
+      - FINAL_TOP_K=${FINAL_TOP_K:-3}
+      - PDF_DIR=/app/data
+      - QDRANT_PATH=/app/vectorstore/qdrant_db
+      - BM25_INDEX_PATH=/app/vectorstore/bm25.pkl
+      - SESSION_DB_PATH=/app/state/sessions.db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # no-op on Docker Desktop, needed on Linux
     volumes:
+      - ./data:/app/data
       - ./vectorstore:/app/vectorstore
-      - ./sessions.db:/app/sessions.db
+      - ./state:/app/state                    # directory mount: Docker never creates a dir in place of the db file
     ports:
       - "8000:8000"
 
@@ -28,8 +32,7 @@ services:
       dockerfile: Dockerfile.frontend
     depends_on:
       - api
+    environment:
+      - API_URL=http://api:8000
     ports:
       - "8501:8501"
-
-volumes:
-  ollama_data:
