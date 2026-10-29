@@ -48,7 +48,7 @@ PDFs in data/ → ingest.py → Qdrant (dense vectors) + BM25 (sparse index) in 
 
 ## Run it on macOS
 
-**Prerequisites:** [Homebrew](https://brew.sh), Python 3.11+, and optionally Docker Desktop.
+**Prerequisites:** [Homebrew](https://brew.sh), **Python 3.11 or 3.12** (3.13+ fails to build the pinned `pydantic-core`; run `brew install python@3.12`), and optionally Docker Desktop.
 
 ### 1. Ollama (the local LLM)
 
@@ -70,14 +70,15 @@ respawning on 127.0.0.1.
 ### 2a. Option A: Python venv (simplest, fastest)
 
 ```bash
-make setup                 # venv, dependencies, .env, model pull
+make setup                 # venv (Python 3.12), dependencies, .env, model pull
+                           # use another interpreter: make setup PYTHON=/opt/homebrew/bin/python3.11
 # copy your PDFs into data/
 make ingest                # build the vector store
 make api                   # terminal 1: http://localhost:8000
 make ui                    # terminal 2: http://localhost:8501
 ```
 
-Without make: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`,
+Without make: `python3.12 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`,
 then `python ingest.py`, `uvicorn main:app --port 8000`, `streamlit run app.py`.
 
 ### 2b. Option B: Docker Compose
@@ -105,6 +106,7 @@ for speed), `RETRIEVAL_TOP_K`, `FINAL_TOP_K`.
 | Slow answers | Use a smaller model (`qwen2.5:1.5b`), keep `USE_RERANKER=false`, lower `FINAL_TOP_K` |
 | Empty answers or "no context" | Run ingestion; check there are PDFs in `data/` |
 | `sqlite3: unable to open database file` | Fixed by the `./state` directory mount; delete any stray `sessions.db` directory |
+| `pydantic-core` fails to build (`PyO3 ... Python 3.14`) | The venv uses a too-new Python. `rm -rf .venv && brew install python@3.12 && make setup` |
 | Docker build is huge or slow | Check `.dockerignore` is present (keeps `.venv`, PDFs and vector stores out) |
 
 ## Evaluation
